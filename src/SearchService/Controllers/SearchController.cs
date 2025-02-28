@@ -10,10 +10,8 @@ namespace SearchService.Controllers
     [ApiController]
     public class SearchController : ControllerBase
     {
-        private HttpClient _httpClient;
-
         [HttpGet]
-        public async Task<ActionResult<List<Item>>> SearchItems(SearchParams searchParams)
+        public async Task<ActionResult<List<Item>>> SearchItems([FromQuery] SearchParams searchParams)
         {
             var query = DB.PagedSearch<Item, Item>();
             query.Sort(x => x.Ascending(a => a.Make));
