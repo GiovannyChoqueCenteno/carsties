@@ -20,7 +20,7 @@ namespace AuctionService.Controllers
         private readonly IPublishEndpoint _publishEndPoint;
 
         public AuctionController(ApplicationDbContext context, IMapper mapper
-        ,IPublishEndpoint publishEndpoint)
+        , IPublishEndpoint publishEndpoint)
         {
             _context = context;
             _mapper = mapper;
@@ -52,8 +52,8 @@ namespace AuctionService.Controllers
             var auction = _mapper.Map<Auction>(createAuctionDto);
             auction.Seller = "test";
             _context.Auctions.Add(auction);
-          
-          
+
+
             var newAuction = _mapper.Map<AuctionDto>(auction);
 
             await _publishEndPoint.Publish(_mapper.Map<AuctionCreated>(newAuction));
@@ -61,7 +61,7 @@ namespace AuctionService.Controllers
             var result = await _context.SaveChangesAsync() > 0;
 
             if (!result) return BadRequest("Failed to create auction");
-            return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id },newAuction);
+            return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id }, newAuction);
         }
         [HttpPut("{id}")]
         public async Task<ActionResult<AuctionDto>> UpdateAuction(Guid id, UpdateActionDto updateAuctionDto)
@@ -76,6 +76,7 @@ namespace AuctionService.Controllers
             auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
             auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
 
+            await _publishEndPoint.Publish(_mapper.Map<AuctionUpdated>(auction));
             var result = await _context.SaveChangesAsync() > 0;
             if (!result) return BadRequest("Failed to update auction");
             return Ok();
@@ -88,6 +89,11 @@ namespace AuctionService.Controllers
             if (auction == null) return NotFound();
 
             _context.Auctions.Remove(auction);
+
+            await _publishEndPoint.Publish<AuctionDeleted>(new
+            {
+                Id = auction.Id
+            });
 
             var result = await _context.SaveChangesAsync() > 0;
             if (!result) return BadRequest("Failed to update auction");

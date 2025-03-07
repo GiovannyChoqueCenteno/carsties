@@ -26,16 +26,5 @@ public class DbInitializer
         {
             await DB.SaveAsync(items);
         }
-        // if (count == 0)
-        // {
-        //     Console.WriteLine("Seeding data");
-        //     var itemData = await File.ReadAllTextAsync("Data/auctions.json");
-        //     var options = new JsonSerializerOptions
-        //     {
-        //         PropertyNameCaseInsensitive = false
-        //     };
-        //     var items = JsonSerializer.Deserialize<List<Item>>(itemData, options);
-        //     await DB.SaveAsync(items);
-        // }
     }
 }
