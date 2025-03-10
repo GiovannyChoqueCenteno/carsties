@@ -5,6 +5,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Contracts;
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,13 +47,13 @@ namespace AuctionService.Controllers
             .FirstOrDefaultAsync(x => x.Id == id);
             return _mapper.Map<AuctionDto>(auctions);
         }
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto createAuctionDto)
         {
             var auction = _mapper.Map<Auction>(createAuctionDto);
-            auction.Seller = "test";
+            auction.Seller = User.Identity.Name;
             _context.Auctions.Add(auction);
-
 
             var newAuction = _mapper.Map<AuctionDto>(auction);
 
@@ -63,13 +64,14 @@ namespace AuctionService.Controllers
             if (!result) return BadRequest("Failed to create auction");
             return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id }, newAuction);
         }
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<AuctionDto>> UpdateAuction(Guid id, UpdateActionDto updateAuctionDto)
         {
             var auction = await _context.Auctions.Include(x => x.Item)
                 .FirstOrDefaultAsync(x => x.Id == id);
             if (auction == null) return NotFound();
-
+            if (auction.Seller != User.Identity.Name) return Forbid();
             auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
             auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
             auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
@@ -81,13 +83,13 @@ namespace AuctionService.Controllers
             if (!result) return BadRequest("Failed to update auction");
             return Ok();
         }
-
+        [Authorize]
         [HttpDelete("{id}")]
-        public async Task<ActionResult<AuctionDto>> DeleteAction(Guid id, UpdateActionDto updateAuctionDto)
+        public async Task<ActionResult<AuctionDto>> DeleteAction(Guid id)
         {
             var auction = await _context.Auctions.FindAsync(id);
             if (auction == null) return NotFound();
-
+            if (auction.Seller != User.Identity.Name) return Forbid();
             _context.Auctions.Remove(auction);
 
             await _publishEndPoint.Publish<AuctionDeleted>(new
