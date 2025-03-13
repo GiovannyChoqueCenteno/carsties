@@ -12,9 +12,9 @@ public class Item : Entity
     public int Mileage { get; set; }
     public string ImageUrl { get; set; }
     public string Seller { get; set; }
-    public int CurrentHighBid { get; set; }
+    public int? CurrentHighBid { get; set; }
     public string Winner { get; set; }
-    public int SoldAmount { get; set; }
+    public int? SoldAmount { get; set; }
     public DateTime AuctionEnd { get; set; }
     public DateTime UpdateAt { get; set; }
 }

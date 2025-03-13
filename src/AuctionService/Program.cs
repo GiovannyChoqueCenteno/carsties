@@ -1,3 +1,4 @@
+using AuctionService.Consumers;
 using AuctionService.Data;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,21 +16,25 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddMassTransit(x =>
 {
+
     x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
     {
         o.QueryDelay = TimeSpan.FromSeconds(10);
         o.UsePostgres();
         o.UseBusOutbox();
     });
+
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedFaultConsumer>();
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
     x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.Host(builder.Configuration["RabbitMq:Host"], "/", (host) =>
-        {
-            host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
-            host.Password(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
-        });
-        cfg.ConfigureEndpoints(context);
-    });
+      {
+          cfg.Host(builder.Configuration["RabbitMq:Host"], "/", (host) =>
+          {
+              host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
+              host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest"));
+          });
+          cfg.ConfigureEndpoints(context);
+      });
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

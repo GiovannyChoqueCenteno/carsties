@@ -13,7 +13,7 @@ RUN dotnet restore microservices.sln
 
 COPY src/SearchService src/SearchService
 COPY src/Contracts src/Contracts
-WORKDIR /app/src/AuctionService
+WORKDIR /app/src/SearchService
 RUN dotnet publish -c Release -o /app/src/out
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
