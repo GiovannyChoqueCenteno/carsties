@@ -24,50 +24,50 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
-  # auction-svc:
-  #   image: giocc/auction-svc:latest
-  #   build:
-  #     context: .
-  #     dockerfile: src/AuctionService/Dockerfile
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Development
-  #     - ASPNETCORE_URLS=http://+:80
-  #     - RabbitMq__Host=rabbitmq
-  #     - RabbitMq__Username=guest
-  #     - RabbitMq__Password=guest
-  #     - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;User Id=postgres;Password=contraseña;Database=auction
-  #     - IdentityServiceUrl=http://identity-svc
-  #   ports:
-  #     - 7001:80
-  #   depends_on:
-  #     - postgres
-  #     - rabbitmq
-  # search-svc:
-  #   image: giocc/search-svc:latest
-  #   build:
-  #     context: .
-  #     dockerfile: src/SearchService/Dockerfile
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Development
-  #     - ASPNETCORE_URLS=http://+:80
-  #     - RabbitMq__Host=rabbitmq
-  #     - ConnectionStrings__MongoDbConnection=mongodb://root:contraseña@mongodb:2701
-  #     - AuctionServiceUrl=http://auction-svc
-  #   ports:
-  #     - 7002:80
-  #   depends_on:
-  #     - mongodb
-  #     - rabbitmq
-  # identity-svc:
-  #   image: giocc/identity-svc:latest
-  #   build:
-  #     context: .
-  #     dockerfile: src/IdentityService/Dockerfile
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Development
-  #     - ASPNETCORE_URLS=http://+:80
-  #     - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;User Id=postgres;Password=contraseña;Database=auction
-  #   ports:
-  #     - 5001:80
-  #   depends_on:
-  #     - postgres
+  auction-svc:
+    image: giocc/auction-svc:latest
+    build:
+      context: .
+      dockerfile: src/AuctionService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
+      - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;User Id=postgres;Password=contraseña;Database=auction
+      - IdentityServiceUrl=http://identity-svc
+    ports:
+      - 7001:80
+    depends_on:
+      - postgres
+      - rabbitmq
+  search-svc:
+    image: giocc/search-svc:latest
+    build:
+      context: .
+      dockerfile: src/SearchService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMq__Host=rabbitmq
+      - ConnectionStrings__MongoDbConnection=mongodb://root:contraseña@mongodb:27017
+      - AuctionServiceUrl=http://auction-svc
+    ports:
+      - 7002:80
+    depends_on:
+      - mongodb
+      - rabbitmq
+  identity-svc:
+    image: giocc/identity-svc:latest
+    build:
+      context: .
+      dockerfile: src/IdentityService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=postgres;Port=5432;User Id=postgres;Password=contraseña;Database=auction
+    ports:
+      - 5001:80
+    depends_on:
+      - postgres
