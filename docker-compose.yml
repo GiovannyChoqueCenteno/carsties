@@ -89,3 +89,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+  gateway-svc:
+    image: giocc/gateway-svc:latest
+    build:
+      context: .
+      dockerfile: src/GatewayService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+    ports:
+      - 6001:80
