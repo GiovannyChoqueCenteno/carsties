@@ -23,12 +23,11 @@ namespace SearchService.Controllers
             query = searchParams.OrderBy switch
             {
                 "make" => query.Sort(x => x.Ascending(a => a.Make)),
-                "model" => query.Sort(x => x.Ascending(a => a.Model)),
-                "year" => query.Sort(x => x.Ascending(a => a.Year)),
-                _ => query
+                "new" => query.Sort(x => x.Descending(a => a.CreatedAt)),
+                _ => query.Sort(x => x.Ascending(a =>a.AuctionEnd))
             };
 
-            query = searchParams.OrderBy switch
+            query = searchParams.FilterBy switch
             {
                 "finished" => query.Match(x => x.AuctionEnd < DateTime.UtcNow),
                 "endingSoon" => query.Match(x => x.AuctionEnd < DateTime.UtcNow.AddHours(6)

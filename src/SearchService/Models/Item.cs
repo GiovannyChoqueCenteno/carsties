@@ -17,4 +17,7 @@ public class Item : Entity
     public int? SoldAmount { get; set; }
     public DateTime AuctionEnd { get; set; }
     public DateTime UpdateAt { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    
 }
